@@ -5,5 +5,8 @@
 #' @seealso \code{\link{load}} which this function wraps.
 #' @export
 #' @examples
-#' a <- local.load("model.RData")
+#' a <- 1:10
+#' save(a, file="a.RData")
+#' b <- local.load("a.RData")
 local.load <- function(file.name) local(get(load(file.name)))
+
