@@ -121,3 +121,40 @@ read.mda.dat <- function(fname.dat) {
   rownames(df) <- sapply(lines[(nDescriptors+2):length(lines)], "[", 2)
   return(df)
 }
+
+
+
+#' @title Cross-validation result of optimal caret model
+#' @description Returns result of cross-validation step for the optimal model obtained by caret.
+#' @param caret.model object of classs train returned by caret train function.
+#' @return vector of predicted values of all folds during cross-validation.
+#' @export
+#' @examples
+#' cv.pred <- getCV(pls.model)
+getCV <- function(caret.model) {
+  df <- caret.model$pred
+  best <- caret.model$bestTune
+  ids <- apply(df[ ,names(best), drop=FALSE], 1, function(r) all(r == best[1,]) )
+  df <- df[ids, ]
+  df <- df[order(df$rowIndex), c("pred")]
+  return(df)
+}
+
+
+
+#' @title Named list
+#' @description Creates a named list from given objects.
+#' @usage named.list(...)
+#' @param ... comma separated list of objects.
+#' @return list of given objects with corresponding names.
+#' @seealso \code{\link{list}}.
+#' @export
+#' @examples
+#' a <- 1:10
+#' b <- LETTERS[1:5]
+#' named.list(a, b)
+named.list <- function(...) {
+  names <- as.list(substitute(list(...)))[-1]
+  setNames(list(...), names)
+}
+
