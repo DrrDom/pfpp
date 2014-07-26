@@ -96,3 +96,28 @@ com.cor <- function(x.cor, nx, y.cor, ny){
 #' a %nin% b
 #' !(a %in% b)
 `%nin%` <- Negate(`%in%`)
+
+
+
+#' @title Read dat-file of MDA1 program
+#' @description Read dat-file contained descriptors of set of chemical compounds.
+#' @param fname.dat name of dat-file created by MDA1 program.
+#' @return data.frame of descriptors of set of chemical compounds.
+#' @export
+#' @examples
+#' df <- read.mda.dat("all_simplexes.dat")
+read.mda.dat <- function(fname.dat) {
+  # read cds file
+  fname.cds <- sub(".dat$", ".cds", fname.dat)
+  lines <- scan(fname.cds, sep = "\n", quote = "", what = character())
+  lines <- strsplit(lines, " ")
+  nCompounds <- as.numeric(lines[[1]][2])
+  nDescriptors <- as.numeric(lines[[1]][1])
+  # read dat file
+  df <- readBin(fname.dat, "numeric", n = nCompounds * nDescriptors, size = 4)
+  df <- as.data.frame(matrix(df, nCompounds, nDescriptors, byrow = TRUE))
+  # set names for compounds and descriptors
+  colnames(df) <- sapply(lines[2:(nDescriptors+1)], "[", 3)
+  rownames(df) <- sapply(lines[(nDescriptors+2):length(lines)], "[", 2)
+  return(df)
+}
