@@ -1,4 +1,4 @@
-#' Load Rdata container into the local variable.
+#' Load Rdata container into a local variable.
 #'
 #' @param file.name name of RData file to load.
 #' @return object contained in RData file.
@@ -12,8 +12,8 @@ local.load <- function(file.name) local(get(load(file.name)))
 
 
 
-#' Returns TP, TN, FP, FN, sensitivity, specificity, balanced accuracy and accuracy for binary classification task.
-#'
+#' @title Statistic for binary classification task.
+#' @description Returns TP, TN, FP, FN, sensitivity, specificity, balanced accuracy and accuracy for binary classification task.
 #' @param pred vector of predicted labels (0, 1).
 #' @param obs vector of observed labels (0, 1).
 #' @return names vector contained TP, TN, FP, FN, sensitivity, specificity, balanced accuracy and accuracy.
@@ -42,10 +42,10 @@ getBinaryStat <- function (pred, obs) {
 
 
 
-#' Returns determination coefficient for external test set or cross-validation.
-#'
+#' @title Determination coefficient for external test set or cross-validation.
+#' @description Returns determination coefficient for external test set or cross-validation.
 #' @param ts.pred predicted values for external test set or cross-validation folds.
-#' @param obs observed values for external test set or cross-validation folds.
+#' @param ts.obs observed values for external test set or cross-validation folds.
 #' @param ws.obs.mean mean value for training set. If determination coefficient for cross-validation folds is calculated, then this parameter can be left as is.
 #' @return value of determination coefficient calculated according to formula 1-PRESS/SS.
 #' @export
@@ -60,10 +60,8 @@ R2test <- function(ts.pred, ts.obs, ws.obs.mean = mean(ts.obs)) {
 
 
 
-
-
-#' Retuns propability of significance of differance between two correlation coefficients.
-#'
+#' @title Propability of difference between two correlation coefficients.
+#' @description Retuns propability of significance of difference between two correlation coefficients.
 #' @param x.cor first correlation coefficient.
 #' @param nx number of objects used in calculation of first correlation coefficient.
 #' @param y.cor second correlation coefficient.
@@ -81,3 +79,20 @@ com.cor <- function(x.cor, nx, y.cor, ny){
   w=sqrt(1/(nx-1)+2/(nx-1)^2+1/(ny-1)+2/(ny-1)^2)
   2*pnorm(-abs((z1-z2)/w),0,1)
 }
+
+
+#' @title Non-matching comparison
+#' @description Returns a logical vector indicating if there is a non-match or match for its left operand. Inverse action relatively to \%in\% function
+#' @usage x \%nin\% y
+#' @param x vector of values to be matched
+#' @param y vector of values to be matched against.
+#' @return logical vector of TRUE (non-match) and FALSE (match).
+#' @seealso \code{\link{\%in\%}}.
+#' @export
+#' @examples
+#' set.seed(42)
+#' a <- sample(0:1, 20, T)
+#' b <- sample(0:1, 20, T)
+#' a %nin% b
+#' !(a %in% b)
+`%nin%` <- Negate(`%in%`)
