@@ -1,0 +1,9 @@
+Package: pfpp
+Type: Package
+Title: Functions to facilitate file loading, calculation of statistical characteristics, etc.
+Version: 1.0
+Date: 2014-07-25
+Author: Pavel Polishchuk
+Maintainer: Pavel Polishchuk <pavel_polishchuk@ukr.net>
+Description: Frequently used fucntions which can make it easier to load files of specific format, calculate different statistical characteristics, etc.
+License: MIT
