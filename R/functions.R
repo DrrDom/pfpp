@@ -158,3 +158,20 @@ named.list <- function(...) {
   setNames(list(...), names)
 }
 
+
+
+#' @title Adjust dataset
+#' @description Add new columns to data.frame, fill them with specified value and trim columns which are absent in col.names.
+#' @param df data.frame which should be modified.
+#' @param col.names columns names which should be present in output data.frame.
+#' @param value value which should fill missing columns.
+#' @return data.frame containing only specified columns in that order. Previously missing columns will be fill with the specified value.
+#' @details this function is useful in adjust features of one dataset (e.g. test set) to another one (e.g. training set). Because some models need exactly the same features in the same order in test set as in training set to make correct prediction.
+#' @export
+#' @examples
+#' df <- data.frame(A=1:10, B=11:20, C=21:30)
+#' adjust.dataset(df, c("A","F","B"))
+adjust.dataset <- function(df, col.names, value = 0) {
+  df[,setdiff(col.names, colnames(df))] <- value
+  df[,col.names]
+}

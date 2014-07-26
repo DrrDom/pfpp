@@ -2,6 +2,7 @@
 
 export("%nin%")
 export(R2test)
+export(adjust.dataset)
 export(com.cor)
 export(getBinaryStat)
 export(getCV)
