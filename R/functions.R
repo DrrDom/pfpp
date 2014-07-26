@@ -91,8 +91,8 @@ com.cor <- function(x.cor, nx, y.cor, ny){
 #' @export
 #' @examples
 #' set.seed(42)
-#' a <- sample(0:1, 20, T)
-#' b <- sample(0:1, 20, T)
+#' a <- c(1,2,15)
+#' b <- 1:10
 #' a %nin% b
 #' !(a %in% b)
 `%nin%` <- Negate(`%in%`)
