@@ -181,9 +181,9 @@ adjust.dataset <- function(df, col.names, value = 0) {
 #' @title Expand two-level factor
 #' @description Create data.frame containing columns corresponding to first part of two-level factor and values equal to the second part of the latter. .
 #' @param v vector of two-level factor variable. Each element represent as at least two-letter string.
-#' @param split character, which will be used to split \code(v) on two parts.
+#' @param split character, which will be used to split \code{v} on two parts.
 #' @param var.name name of variable, which will be used for generation names of newly created variables.
-#' @param comb.sep character, which will be used as a separator in newly created variable names between \code(var.name) and first part of two-level factor \code(v).
+#' @param comb.sep character, which will be used as a separator in newly created variable names between \code{var.name} and first part of two-level factor \code{v}.
 #' @return data.frame.
 #' @export
 #' @examples

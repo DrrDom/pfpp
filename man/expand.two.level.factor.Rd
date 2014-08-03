@@ -8,11 +8,11 @@ expand.two.level.factor(v, split = "", var.name = "var", comb.sep = ":")
 \arguments{
 \item{v}{vector of two-level factor variable. Each element represent as at least two-letter string.}
 
-\item{split}{character, which will be used to split \code(v) on two parts.}
+\item{split}{character, which will be used to split \code{v} on two parts.}
 
 \item{var.name}{name of variable, which will be used for generation names of newly created variables.}
 
-\item{comb.sep}{character, which will be used as a separator in newly created variable names between \code(var.name) and first part of two-level factor \code(v).}
+\item{comb.sep}{character, which will be used as a separator in newly created variable names between \code{var.name} and first part of two-level factor \code{v}.}
 }
 \value{
 data.frame.
