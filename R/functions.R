@@ -175,3 +175,34 @@ adjust.dataset <- function(df, col.names, value = 0) {
   df[,setdiff(col.names, colnames(df))] <- value
   df[,col.names]
 }
+
+
+
+#' @title Expand two-level factor
+#' @description Create data.frame containing columns corresponding to first part of two-level factor and values equal to the second part of the latter. .
+#' @param v vector of two-level factor variable. Each element represent as at least two-letter string.
+#' @param split character, which will be used to split \code(v) on two parts.
+#' @param var.name name of variable, which will be used for generation names of newly created variables.
+#' @param comb.sep character, which will be used as a separator in newly created variable names between \code(var.name) and first part of two-level factor \code(v).
+#' @return data.frame.
+#' @export
+#' @examples
+#' vec <- c("A1","B4",NA,"A4","C2")
+#' expand.two.level.factor(vec)
+expand.two.level.factor <- function(v, split="", var.name="var", comb.sep=":") {
+  df <- as.data.frame(do.call(rbind, strsplit(v, split)), stringsAsFactors = F)
+  colnames(df) <- c(var.name, "value")
+  f <- as.formula(paste("~", colnames(df)[1], "-1", sep=""))
+  m <- model.matrix(f, df)
+  p <- paste("^(", var.name, ")(.*)$", sep="")
+  s <- paste("\\1", comb.sep, "\\2", sep="")
+  colnames(m) <- sub(p, s, colnames(m))
+  m <- t(m)
+  m[m == 1] <- na.omit(df[,2])
+  m <- t(m)
+  m <- as.data.frame(m, stringsAsFactors = F)
+  m <- m[rownames(df),]
+  rownames(m) <- rownames(df)
+  m[is.na(m)] <- 0
+  m
+}
