@@ -179,18 +179,22 @@ adjust.dataset <- function(df, col.names, value = 0) {
 
 
 #' @title Expand two-level factor
-#' @description Create data.frame containing columns corresponding to first part of two-level factor and values equal to the second part of the latter. .
-#' @param v vector of two-level factor variable. Each element represent as at least two-letter string.
-#' @param split character, which will be used to split \code{v} on two parts.
+#' @description Create data.frame containing columns corresponding to first part of two-level factor and values equal to the second part of the latter.
+#' @param vec vector of two-level factor or character variable. Each element is represented as at least two-letter string.
+#' @param split character, which will be used to split \code{vec} on two parts.
 #' @param var.name name of variable, which will be used for generation names of newly created variables.
-#' @param comb.sep character, which will be used as a separator in newly created variable names between \code{var.name} and first part of two-level factor \code{v}.
+#' @param comb.sep character, which will be used as a separator in newly created variable names between \code{var.name} and first part of two-level factor \code{vec}.
+#' @param fill default value to represent missing (\code{NA}) values in input vector.
 #' @return data.frame.
 #' @export
 #' @examples
 #' vec <- c("A1","B4",NA,"A4","C2")
 #' expand.two.level.factor(vec)
-expand.two.level.factor <- function(v, split="", var.name="var", comb.sep=":") {
-  df <- as.data.frame(do.call(rbind, strsplit(v, split)), stringsAsFactors = F)
+expand.two.level.factor <- function(vec, split="", var.name="var", 
+                                    comb.sep=":", fill=NA) {
+  if (!is.character(vec)) 
+    vec <- as.character(vec)
+  df <- as.data.frame(do.call(rbind, strsplit(vec, split)), stringsAsFactors = F)
   colnames(df) <- c(var.name, "value")
   f <- as.formula(paste("~", colnames(df)[1], "-1", sep=""))
   m <- model.matrix(f, df)
@@ -200,9 +204,42 @@ expand.two.level.factor <- function(v, split="", var.name="var", comb.sep=":") {
   m <- t(m)
   m[m == 1] <- na.omit(df[,2])
   m <- t(m)
-  m <- as.data.frame(m, stringsAsFactors = F)
-  m <- m[rownames(df),]
-  rownames(m) <- rownames(df)
-  m[is.na(m)] <- 0
-  m
+  mm <- matrix(fill, nrow=length(vec), ncol=ncol(m))
+  rownames(mm) <- as.character(1:nrow(mm))
+  mm[rownames(m),] <- m
+  colnames(mm) <- colnames(m)
+  rownames(mm) <- NULL
+  as.data.frame(mm, stringsAsFactors = FALSE)
 }
+
+
+
+#' @title Expand one-level factor
+#' @description Creates a design matrix like \code{model.matrix} and fill unused missing (\code{NA}) values with rows of 0.
+#' @param vec factor or character vector..
+#' @param var.name variable name, which will be used for generation names of newly created variables.
+#' @param comb.sep character, which will be used as a separator in newly created variable names between \code{var.name} and \code{vec} levels.
+#' @param fill default value to represent missing (\code{NA}) values in input vector.
+#' @return data.frame.
+#' @seealso \code{\link{model.matrix}}.
+#' @export
+#' @examples
+#' vec <- c("A","B",NA,"A","C")
+#' expand.one.level.factor(vec)
+expand.one.level.factor <- function(vec, var.name="var", 
+                                    comb.sep=":", fill=NA) {
+  if (!is.character(vec)) 
+    vec <- as.character(vec)
+  m <- model.matrix(~ vec - 1)
+  p <- paste("^(vec)(.*)$", sep="")
+  s <- paste(var.name, comb.sep, "\\2", sep="")
+  colnames(m) <- sub(p, s, colnames(m))
+  # init zero matrix of target size
+  mm <- matrix(fill, nrow=length(vec), ncol=ncol(m))
+  rownames(mm) <- as.character(1:nrow(mm))
+  mm[rownames(m),] <- m
+  colnames(mm) <- colnames(m)
+  rownames(mm) <- NULL
+  as.data.frame(mm, stringsAsFactors = FALSE)
+}
+

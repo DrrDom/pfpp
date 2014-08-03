@@ -3,22 +3,25 @@
 \alias{expand.two.level.factor}
 \title{Expand two-level factor}
 \usage{
-expand.two.level.factor(v, split = "", var.name = "var", comb.sep = ":")
+expand.two.level.factor(vec, split = "", var.name = "var", comb.sep = ":",
+  fill = NA)
 }
 \arguments{
-\item{v}{vector of two-level factor variable. Each element represent as at least two-letter string.}
+\item{vec}{vector of two-level factor or character variable. Each element is represented as at least two-letter string.}
 
-\item{split}{character, which will be used to split \code{v} on two parts.}
+\item{split}{character, which will be used to split \code{vec} on two parts.}
 
 \item{var.name}{name of variable, which will be used for generation names of newly created variables.}
 
-\item{comb.sep}{character, which will be used as a separator in newly created variable names between \code{var.name} and first part of two-level factor \code{v}.}
+\item{comb.sep}{character, which will be used as a separator in newly created variable names between \code{var.name} and first part of two-level factor \code{vec}.}
+
+\item{fill}{default value to represent missing (\code{NA}) values in input vector.}
 }
 \value{
 data.frame.
 }
 \description{
-Create data.frame containing columns corresponding to first part of two-level factor and values equal to the second part of the latter. .
+Create data.frame containing columns corresponding to first part of two-level factor and values equal to the second part of the latter.
 }
 \examples{
 vec <- c("A1","B4",NA,"A4","C2")
