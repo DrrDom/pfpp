@@ -256,3 +256,17 @@ sirms.read <- function(fname) {
   return(x)
 }
 
+
+
+#' @title Remove constant variables
+#' @description remove constant variables from a data.frame.
+#' @param df data.frame from which constant variable will be removed.
+#' @return data.frame with removed constant variables.
+#' @export
+#' @examples
+#' df <- data.frame(a = rnorm(5), b = 1:5, c = rep(1, 5))
+#' df <- remove.const.vars(df)
+remove.const.vars <- function(df) {
+  df <- df[, sapply(df, function(v) length(unique(v)) > 1)]
+  return(df)
+}
