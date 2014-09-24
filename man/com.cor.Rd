@@ -21,9 +21,6 @@ propability of significance of differance between two correlation coefficients.
 Retuns propability of significance of difference between two correlation coefficients.
 }
 \examples{
-set.seed(42)
-cv.obs <- runif(50, 0, 10)
-cv.pred <- cv.obs + rnorm(50)
-R2test(cv.pred, cv.obs)
+com.cor(0.90, 100, 0.82, 150)
 }
 

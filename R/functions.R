@@ -243,4 +243,16 @@ expand.one.level.factor <- function(vec, var.name="var",
 
 
 
+#' @title Read tab-delimited text file with sirms descriptors (output of sirms.py)
+#' @description Load tab-delimited text file with sirms descriptors in \code{data.frame}.
+#' @param fname file name of tab-delimited text file with sirms descriptors.
+#' @return data.frame.
+#' @export
+sirms.read <- function(fname) {
+  if (!require(data.table)) stop("Error. Install data.table package.")
+  x <- as.data.frame(data.table::fread(fname, sep="\t", header = TRUE))
+  rownames(x) <- x[,1]
+  x <- x[,-1]
+  return(x)
+}
 
