@@ -69,16 +69,14 @@ R2test <- function(ts.pred, ts.obs, ws.obs.mean = mean(ts.obs)) {
 #' @return propability of significance of differance between two correlation coefficients.
 #' @export
 #' @examples
-#' set.seed(42)
-#' cv.obs <- runif(50, 0, 10)
-#' cv.pred <- cv.obs + rnorm(50)
-#' R2test(cv.pred, cv.obs)
+#' com.cor(0.90, 100, 0.82, 150)
 com.cor <- function(x.cor, nx, y.cor, ny){
   z1=0.5*log((1+x.cor)/(1-x.cor))
   z2=0.5*log((1+y.cor)/(1-y.cor))
   w=sqrt(1/(nx-1)+2/(nx-1)^2+1/(ny-1)+2/(ny-1)^2)
   2*pnorm(-abs((z1-z2)/w),0,1)
 }
+
 
 
 #' @title Non-matching comparison
@@ -242,4 +240,7 @@ expand.one.level.factor <- function(vec, var.name="var",
   rownames(mm) <- NULL
   as.data.frame(mm, stringsAsFactors = FALSE)
 }
+
+
+
 
