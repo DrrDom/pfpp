@@ -1,4 +1,4 @@
-#' Load Rdata container into a local variable.
+#' Load RData container into a local variable.
 #'
 #' @param file.name name of RData file to load.
 #' @return object contained in RData file.
@@ -269,4 +269,110 @@ sirms.read <- function(fname) {
 remove.const.vars <- function(df) {
   df <- df[, sapply(df, function(v) length(unique(v)) > 1)]
   return(df)
+}
+
+
+
+#' @title Creation of folds for group-out cross-validation based on Monte Carlo method.
+#' @description Function takes input vector of variables which will be used to group 
+#' input objects. It creates folds with approaximately equal number of objects in each fold. 
+#' All object of the same group put in the single fold.
+#' @param v input vector of group variables.
+#' @param nfolds maximum number of folds. But if it is not possible to create 
+#' the specified number of folds its number will be automatically decreased.
+#' @param max_iter maximum number of Monte Carlo iterations.
+#' @param start_opt_param strting parameter of Monter Carlo optimization.
+#' @param error_limit if final error will be greater than this values results 
+#' will be discarded.
+#' @param seed seed for random number generator to reproduce results.
+#' @return vector of folds numbers for each input object.
+#' @export
+#' @examples
+#' df <- data.frame(A=runif(100), B=runif(100), C=sample(LETTERS[1:10], 100, T))
+#' res <- create_folds_mc(df$C, 5)
+create_folds_mc <- function(v, nfolds = "auto", max_iter = 1000, start_opt_param = 100, 
+                            error_limit = NA, seed = 0) {
+  
+  opt_func <- function(tmp, opt) {
+    return(var(aggregate(tmp, list(opt), sum)[,2]))
+  }
+  
+  replace_value <- function(input_vector, value, pos) {
+    input_vector[pos] <- value
+    return(input_vector)
+  }
+  
+  if (nfolds == "auto") {
+    ngroups <- round(length(v) / max(table(v)))
+    nfolds <- min(5, ngroups)
+  }   
+  
+  tmp <- table(v)
+  set.seed(seed)
+  tmp <- sample(tmp)
+  
+  opt <- rep(1:nfolds, length(tmp) / (nfolds) + 1)
+  length(opt) <- length(tmp)
+  
+  dec_param <- start_opt_param / max_iter
+  niter <- 1
+  cur_var <- opt_func(tmp, opt)
+  
+  while (niter < max_iter) {
+    # avoid lost of fold number
+    new_opt <- replace_value(opt, sample.int(nfolds, 1), sample.int(length(opt), 1))
+    while (length(unique(new_opt)) < nfolds)
+      new_opt <- replace_value(opt, sample.int(nfolds, 1), sample.int(length(opt), 1))
+    new_var <- opt_func(tmp, new_opt)
+    if (new_var < cur_var) {
+      opt <- new_opt
+      cur_var <- new_var
+    } else {
+      if (exp( -(new_var - cur_var) / start_opt_param ) > runif(1)) {
+        opt <- new_opt
+        cur_var <- new_var
+      }
+    }
+    start_opt_param <- start_opt_param - dec_param
+    niter <- niter + 1
+  }
+  
+  names(opt) <- names(tmp)
+  
+  # if error is greater than specified limit then discard this split
+  if (!is.na(error_limit) & sqrt(cur_var) > error_limit) {
+    return(NULL)
+  } else {
+    return(opt[as.character(v)])
+  }
+  
+}
+
+
+
+#' @title Calculate Tanimoto similarity coefficient beetwen two sets of folds for cross-validation.
+#' @description Calculate Tanimoto similarity coefficient beetwen two sets of folds for 
+#' cross-validation considering objects grouping in each folds
+#' @param g1, g2 input vectors with folds numbers for each objects.
+#' @return mean Tanimoto between input vectors considering objects grouping in folds
+#' @export
+#' @examples
+#' set.seed(42)
+#' g1 <- sample(1:5, 100, T)
+#' g2 <- sample(1:5, 100, T)
+#' groupwise_tanimoto(g1, g2)
+groupwise_tanimoto <- function(g1, g2) {
+  
+  tanimoto <- function(a, b) {
+    return(length(intersect(a, b)) / length(union(a, b)))
+  }
+  
+  g1 <- split(seq_along(g1), g1)
+  g2 <- split(seq_along(g2), g2)
+  result <- sapply(g1, function(i) {
+    max(sapply(g2, function(j) {
+      tanimoto(i, j)
+    }))
+  })
+  mean(result)
 }
