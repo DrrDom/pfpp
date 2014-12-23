@@ -353,7 +353,7 @@ create_folds_mc <- function(v, nfolds = "auto", max_iter = 1000, start_opt_param
 #' @title Calculate Tanimoto similarity coefficient beetwen two sets of folds for cross-validation.
 #' @description Calculate Tanimoto similarity coefficient beetwen two sets of folds for 
 #' cross-validation considering objects grouping in each folds
-#' @param g1, g2 input vectors with folds numbers for each objects.
+#' @param g1,g2 input vectors with folds numbers for each objects.
 #' @return mean Tanimoto between input vectors considering objects grouping in folds
 #' @export
 #' @examples
@@ -375,4 +375,59 @@ groupwise_tanimoto <- function(g1, g2) {
     }))
   })
   mean(result)
+}
+
+
+
+#' @title Select dissimilar sets of folds.
+#' @description Select most dissimilar folds sets from the input list based on groupwise Tanimoto measure.
+#' @param folds_list list of sets of folds, each element is a vector of folds numbers.
+#' @param max_sets maximum number of sets which will be remained
+#' @param max_sim maximum similarity value, only sets which have less or equal similarity to all other sets will be remained.
+#' @return list of sets of folds which are dissimilar to each other
+#' @export
+#' @examples
+#' folds_list <- lapply(1:10, function(i) sample.int(5, 100, T))
+#' selected_folds <- select_folds(folds_list, 5, 0.7)
+select_folds <- function(folds_list, max_sets = 10, max_sim = 0.8, print_sim_matrix = FALSE) {
+  
+  res_group <- combn(seq_along(folds_list), 2, 
+                     function(i) round(pfpp::groupwise_tanimoto(folds_list[[i[1]]], folds_list[[i[2]]]), 3))
+  
+  m <- matrix(0.0, length(folds_list), length(folds_list))
+  m[lower.tri(m)] <- res_group
+  colnames(m) <- seq_along(folds_list)
+  rownames(m) <- seq_along(folds_list)
+  
+  while(nrow(m) > max_sets | max(m) > max_sim) {
+    i <- which.max(apply(m, 1, max))
+    m <- m[-i, -i]
+  }
+  
+  if (print_sim_matrix)
+    print(m)
+  
+  return(folds_list[as.integer(rownames(m))])
+  
+}
+
+
+
+#' @title Create folds of test sets to use in caret.
+#' @description Transform list of sets of folds to list which may be passed to caret train function.
+#' @param folds_list list of sets of folds, each element is a vector of folds numbers.
+#' @return list of folds which suit the requirements of caret train function.
+#' @export
+#' @examples
+#' folds_list <- lapply(1:10, function(i) sample.int(5, 100, T))
+#' caret_folds_list <- create_caret_folds(folds_list)
+create_caret_folds <- function(folds_list) {
+  caret_folds <- lapply(folds_list, function(f) {
+    split(seq_along(f), f)
+  })
+  caret_folds <- unlist(caret_folds, recursive = FALSE)
+  names(caret_folds) <- unlist(lapply(seq_along(folds_list), function(i) {
+    paste0("Fold", 1:length(unique(folds[[i]])), ".Rep", i)
+  }))
+  return(caret_folds)
 }

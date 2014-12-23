@@ -6,7 +6,7 @@
 groupwise_tanimoto(g1, g2)
 }
 \arguments{
-\item{g1,}{g2 input vectors with folds numbers for each objects.}
+\item{g1,g2}{input vectors with folds numbers for each objects.}
 }
 \value{
 mean Tanimoto between input vectors considering objects grouping in folds
