@@ -9,7 +9,7 @@ create_caret_folds(folds_list)
 \item{folds_list}{list of sets of folds, each element is a vector of folds numbers.}
 }
 \value{
-list of folds which suit the requirements of caret train function.
+list of training set object for each fold in format which suit the requirements of caret train function.
 }
 \description{
 Transform list of sets of folds to list which may be passed to caret train function.

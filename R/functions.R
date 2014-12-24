@@ -416,18 +416,21 @@ select_folds <- function(folds_list, max_sets = 10, max_sim = 0.8, print_sim_mat
 #' @title Create folds of test sets to use in caret.
 #' @description Transform list of sets of folds to list which may be passed to caret train function.
 #' @param folds_list list of sets of folds, each element is a vector of folds numbers.
-#' @return list of folds which suit the requirements of caret train function.
+#' @return list of training set object for each fold in format which suit the requirements of caret train function.
 #' @export
 #' @examples
 #' folds_list <- lapply(1:10, function(i) sample.int(5, 100, T))
 #' caret_folds_list <- create_caret_folds(folds_list)
 create_caret_folds <- function(folds_list) {
   caret_folds <- lapply(folds_list, function(f) {
-    split(seq_along(f), f)
+    lapply(unique(f), function(i) which(f != i))
   })
   caret_folds <- unlist(caret_folds, recursive = FALSE)
   names(caret_folds) <- unlist(lapply(seq_along(folds_list), function(i) {
-    paste0("Fold", 1:length(unique(folds[[i]])), ".Rep", i)
+    paste0("Fold", 1:length(unique(folds_list[[i]])), ".Rep", i)
   }))
   return(caret_folds)
 }
+
+
+
