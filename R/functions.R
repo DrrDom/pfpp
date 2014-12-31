@@ -246,11 +246,12 @@ expand.one.level.factor <- function(vec, var.name="var",
 #' @title Read tab-delimited text file with sirms descriptors (output of sirms.py)
 #' @description Load tab-delimited text file with sirms descriptors in \code{data.frame}.
 #' @param fname file name of tab-delimited text file with sirms descriptors.
+#' @param ... further arguments for \code{data.table::fread} function.
 #' @return data.frame.
 #' @export
-sirms.read <- function(fname) {
+sirms.read <- function(fname, ...) {
   if (!require(data.table)) stop("Error. Install data.table package.")
-  x <- as.data.frame(data.table::fread(fname, sep="\t", header = TRUE))
+  x <- as.data.frame(data.table::fread(fname, sep="\t", header = TRUE, ...))
   rownames(x) <- x[,1]
   x <- x[,-1]
   return(x)
@@ -432,5 +433,20 @@ create_caret_folds <- function(folds_list) {
   return(caret_folds)
 }
 
+
+
+#' @title Calculate RMSE.
+#' @description Returns root mean squared deviation.
+#' @param obs observed values.
+#' @param pred predicted values.
+#' @return value of RMSE.
+#' @export
+#' @examples
+#' obs <- runif(100)
+#' pred <- runif(100)
+#' rmse(obs, pred)
+rmse <- function(obs, pred) {
+  sqrt(sum((obs - pred) ^ 2) / (length(obs) - 1))
+}
 
 

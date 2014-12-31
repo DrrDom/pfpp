@@ -3,10 +3,12 @@
 \alias{sirms.read}
 \title{Read tab-delimited text file with sirms descriptors (output of sirms.py)}
 \usage{
-sirms.read(fname)
+sirms.read(fname, ...)
 }
 \arguments{
 \item{fname}{file name of tab-delimited text file with sirms descriptors.}
+
+\item{...}{further arguments for \code{data.table::fread} function.}
 }
 \value{
 data.frame.
