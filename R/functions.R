@@ -428,7 +428,11 @@ create_caret_folds <- function(folds_list) {
   })
   caret_folds <- unlist(caret_folds, recursive = FALSE)
   names(caret_folds) <- unlist(lapply(seq_along(folds_list), function(i) {
-    paste0("Fold", 1:length(unique(folds_list[[i]])), ".Rep", i)
+    paste0("Fold", 
+           formatC(1:length(unique(folds_list[[i]])), 
+                   width = 1 + floor(log10(max(1:length(unique(folds_list[[i]]))))),
+                   flag = "0"),
+           ".Rep", i)
   }))
   return(caret_folds)
 }
@@ -450,3 +454,22 @@ rmse <- function(obs, pred) {
 }
 
 
+
+#' @title Combine datasets
+#' @description Combine two datasets, add new columns absent in each of them and fill them with specified value.
+#' @param df1 first data.frame to combine.
+#' @param df2 second data.frame to combine.
+#' @param value value which should fill missing columns.
+#' @return combined data.frame.
+#' @details this function is useful to rbind two data.frames with different columns.
+#' @export
+#' @examples
+#' df1 <- data.frame(A=1:10, B=11:20, C=21:30)
+#' df2 <- data.frame(E=1:10, C=11:20, B=21:30)
+#' combine.datasets(df1, df2)
+combine.datasets <- function(df1, df2, value = 0) {
+  df1[,setdiff(colnames(df2), colnames(df1))] <- value
+  df2[,setdiff(colnames(df1), colnames(df2))] <- value
+  df2 <- df2[, colnames(df1)]
+  rbind(df1, df2)
+}
