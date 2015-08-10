@@ -473,3 +473,23 @@ combine.datasets <- function(df1, df2, value = 0) {
   df2 <- df2[, colnames(df1)]
   rbind(df1, df2)
 }
+
+
+
+#' Copy data to clipboard suitable for Excel pasting.
+#'
+#' @param x vector, data.frame or matrix to copy.
+#' @return nothing, just copy object to clipboard.
+#' @details column names in copied object will be shifted one column left.
+#' @export
+#' @examples
+#' a <- 1:10
+#' names(a) <- LETTERS[1:10]
+#' write.excel(a)
+#' b <- data.frame(V1 = 1:10, V2 = rnorm(10), row.names = LETTERS[1:10])
+#' write.excel(b)
+write.excel <- function(x, row.names = TRUE, col.names = TRUE, ...) {
+  write.table(x, "clipboard", sep = "\t", row.names = row.names, 
+              col.names = col.names, quote = FALSE, ...)
+}
+  
