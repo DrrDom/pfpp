@@ -492,4 +492,82 @@ write.excel <- function(x, row.names = TRUE, col.names = TRUE, ...) {
   write.table(x, "clipboard", sep = "\t", row.names = row.names, 
               col.names = col.names, quote = FALSE, ...)
 }
+
+
+
+#' Returns statistics of regression caret models with and without 
+#' application of applicability domain.
+#'
+#' @param model model trained with caret package.
+#' @return data.frame which conatains model's parameters, values of R square 
+#' and RMSE with and without application of applicability domain.
+#' @details Applicability domain is estimated by fragment control approach. 
+#' If value of a variable is outside the range of that variable for training set 
+#' then the corresponding case is outside applicability domain and is removed 
+#' while computing model statistics
+#' @export
+#' @examples
+#' reg <- get.DA.reg(model)
+get.DA.reg <- function(model) {
   
+  frag_control <- function(train_df, test_df) {
+    train_names <- colnames(train_df)[!sapply(train_df, function(i) all(i == 0))]
+    which(apply(test_df, 1, function(i) {
+      n <- names(i)[i != 0]
+      length(setdiff(n, train_names)) == 0
+    }))
+  }
+  
+  # add columns fold and rep for predicted data.frame
+  df <- model$pred
+  par_names <- colnames(model$bestTune)
+  df <- cbind(df, do.call(rbind, strsplit(df$Resample, "\\.")))
+  colnames(df)[(ncol(df) - 1) : ncol(df)] <- c("fold", "rep")
+  
+  # calc stat for each rep
+  tmp <- split(df, df[,c(par_names, "rep")])
+  res <- as.data.frame(t(sapply(tmp, function(tmp_df) {
+    c("R2"=pfpp::R2test(tmp_df$pred, tmp_df$obs), "RMSE"=pfpp::rmse(tmp_df$obs, tmp_df$pred))
+  })))
+  
+  # add column with parameters names to the result
+  res <- cbind(res, do.call(rbind, strsplit(rownames(res), "\\.")))
+  colnames(res)[(ncol(res) - length(par_names)):ncol(res)] <- c(par_names, "rep")
+  
+  # find ids in DA
+  ids_da <- lapply(model$control$indexOut, function(case_ids) {
+    ids <- frag_control(model$trainingData[-case_ids,], model$trainingData[case_ids,])
+    case_ids[ids]
+  })
+  ids_da <- split(ids_da, list(sub("^.*(Rep[0-9]*)$", "\\1", names(ids_da))))
+  ids_da <- lapply(ids_da, unlist)
+  
+  # calc stat with DA
+  tmp <- split(df, df[,c(par_names, "rep")])
+  res_da <- as.data.frame(t(sapply(tmp, function(tmp_df) {
+    ids <- tmp_df$rowIndex %in% ids_da[[as.character(unique(tmp_df$rep))]]
+    c("R2_DA" = pfpp::R2test(tmp_df$pred[ids], tmp_df$obs[ids], mean(tmp_df$obs)), 
+      "RMSE_DA" = pfpp::rmse(tmp_df$obs[ids], tmp_df$pred[ids]),
+      "DA_coverage" = sum(ids) / length(ids))
+  })))
+  
+  # add column with parameters names to the result
+  res_da <- cbind(res_da, do.call(rbind, strsplit(rownames(res_da), "\\.")))
+  colnames(res_da)[(ncol(res_da) - length(par_names)):ncol(res_da)] <- c(par_names, "rep")
+  
+  output <- cbind(aggregate(res[,1:2], list(res[, par_names]), mean), 
+                  aggregate(res[,1:2], list(res[, par_names]), sd),
+                  aggregate(res_da[,1:2], list(res_da[, par_names]), mean),
+                  aggregate(res_da[,1:2], list(res_da[, par_names]), sd),
+                  aggregate(res_da[,3], list(res_da[, par_names]), mean))
+  
+  colnames(output)[1:length(par_names)] <- par_names
+  output <- output[,!grepl("Group\\.", colnames(output))]
+  colnames(output)[(length(par_names) + 1):ncol(output)] <- 
+    c("R2", "RMSE", "R2_SD", "RMSE_SD", "R2_DA", "RMSE_DA", "R2_DA_SD", 
+      "RMSE_DA_SD", "Coverage")
+  
+  output[,1:length(par_names)] <- sapply(output[,1:length(par_names)], function(i) as.numeric(as.character(i)))
+  
+  return(output)
+}
