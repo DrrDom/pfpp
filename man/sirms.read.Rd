@@ -4,10 +4,13 @@
 \alias{sirms.read}
 \title{Read tab-delimited text file with sirms descriptors (output of sirms.py)}
 \usage{
-sirms.read(fname, ...)
+sirms.read(fname, id.col = 1, ...)
 }
 \arguments{
 \item{fname}{file name of tab-delimited text file with sirms descriptors.}
+
+\item{id.col}{column number or name which contains IDs and which will be converted
+into row.names. To omit this option set it to \code{NULL} or \code{NA}.}
 
 \item{...}{further arguments for \code{data.table::fread} function.}
 }

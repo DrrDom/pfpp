@@ -246,14 +246,25 @@ expand.one.level.factor <- function(vec, var.name="var",
 #' @title Read tab-delimited text file with sirms descriptors (output of sirms.py)
 #' @description Load tab-delimited text file with sirms descriptors in \code{data.frame}.
 #' @param fname file name of tab-delimited text file with sirms descriptors.
+#' @param id.col column number or name which contains IDs and which will be converted 
+#' into row.names. To omit this option set it to \code{NULL} or \code{NA}.
 #' @param ... further arguments for \code{data.table::fread} function.
 #' @return data.frame.
 #' @export
-sirms.read <- function(fname, ...) {
+sirms.read <- function(fname, id.col = 1, ...) {
   if (!require(data.table)) stop("Error. Install data.table package.")
   x <- as.data.frame(data.table::fread(fname, sep="\t", header = TRUE, ...))
-  rownames(x) <- x[,1]
-  x <- x[,-1]
+  if (is.null(id.col) | is.na(id.col)) 
+    return(x)
+  if (is.numeric(id.col) & id.col > 0) {
+    rownames(x) <- x[, id.col]
+    x <- x[, -id.col]
+  }
+  if (is.character(id.col)) {
+    id.col <- which(colnames(x) == id.col)
+    rownames(x) <- x[, id.col]
+    x <- x[, -id.col]
+  }
   return(x)
 }
 
