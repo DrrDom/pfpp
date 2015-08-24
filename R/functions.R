@@ -550,6 +550,8 @@ get.DA.reg <- function(model) {
     ids <- frag_control(model$trainingData[-case_ids,], model$trainingData[case_ids,])
     case_ids[ids]
   })
+  # hack, because $indexOut has names like (Resample01, ...) while $index (Fold1.Rep01, ...)
+  names(ids_da) <- names(model$control$index)
   ids_da <- split(ids_da, list(sub("^.*(Rep[0-9]*)$", "\\1", names(ids_da))))
   ids_da <- lapply(ids_da, unlist)
   
