@@ -8,6 +8,10 @@ write.excel(x, row.names = TRUE, col.names = TRUE, ...)
 }
 \arguments{
 \item{x}{vector, data.frame or matrix to copy.}
+
+\item{row.names}{copy with row names.}
+
+\item{col.names}{copy with column names.}
 }
 \value{
 nothing, just copy object to clipboard.

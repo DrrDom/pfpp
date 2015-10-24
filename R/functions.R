@@ -490,6 +490,8 @@ combine.datasets <- function(df1, df2, value = 0) {
 #' Copy data to clipboard suitable for Excel pasting.
 #'
 #' @param x vector, data.frame or matrix to copy.
+#' @param row.names copy with row names.
+#' @param col.names copy with column names.
 #' @return nothing, just copy object to clipboard.
 #' @details column names in copied object will be shifted one column left.
 #' @export
@@ -583,4 +585,32 @@ get.DA.reg <- function(model) {
   output[,1:length(par_names)] <- sapply(output[,1:length(par_names)], function(i) as.numeric(as.character(i)))
   
   return(output)
+}
+
+
+
+#' Save text data as binary to save used encoding.
+#'
+#' @param df is `data.frame` or `matrix` to save.
+#' @param sep separator of fields.
+#' @param row.names write row names.
+#' @param col.names write column names.
+#' @return nothing.
+#' @details This function was created as a workaround for Windows users to properly 
+#' save text files with UTF-8 encoding.
+#' @export
+write.as.binary <- function(df, file.name, sep = "\t", row.names = TRUE, col.names = TRUE) {
+  output <- character()
+  if (col.names) {
+    output[1] <- paste0(colnames(df), collapse = sep)
+    if (row.names) {
+      output[1] <- paste0("rownames", sep, output[1])
+    }
+  }
+  tmp <- apply(df, 1, function(i) paste0(i, collapse = "\t"))
+  if (row.names) {
+    tmp <- sapply(1:nrow(df), function(i) paste0(rownames(df)[i], sep, tmp[i]))
+  }
+  output <- c(output, tmp)
+  writeLines(output, file.name, useBytes = TRUE)
 }
