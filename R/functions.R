@@ -130,11 +130,20 @@ read.mda.dat <- function(fname.dat) {
 #' @examples
 #' cv.pred <- getCV(pls.model)
 getCV <- function(caret.model) {
+  
   df <- caret.model$pred
   best <- caret.model$bestTune
   ids <- apply(df[ ,names(best), drop=FALSE], 1, function(r) all(r == best[1,]) )
   df <- df[ids, ]
-  df <- df[order(df$rowIndex), c("pred")]
+  
+  if (grepl("\\.", df$Resample[1])) {
+    df <- cbind(df, do.call(rbind, strsplit(df$Resample, "\\.")))
+    colnames(df)[(ncol(df) - 1):ncol(df)] <- c("fold", "rep")
+    # cast and remove row index column
+    df <- reshape2::dcast(df, rowIndex ~ rep, value.var = "pred")[, -1]
+  } else {
+    df <- df[order(df$rowIndex), c("pred")]
+  }
   return(df)
 }
 
