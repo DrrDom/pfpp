@@ -20,8 +20,8 @@ local.load <- function(file.name) local(get(load(file.name)))
 #' @export
 #' @examples
 #' set.seed(42)
-#' obs <- sample(0:1,10,T)
-#' pred <- sample(0:1,10,T)
+#' obs <- sample(0:1, 10, T)
+#' pred <- sample(0:1, 10, T)
 #' getBinaryStat(pred, obs)
 getBinaryStat <- function (pred, obs) {
   if (length(obs) != length(pred)) {
@@ -37,7 +37,35 @@ getBinaryStat <- function (pred, obs) {
   lst$specificity <- lst$TN / (lst$TN + lst$FP)
   lst$balanced.acc <- (lst$sensitivity + lst$specificity) / 2
   lst$acc <- mean(obs == pred)
+  lst$kappa <- pfpp::getKappa(pred, obs)
   return(unlist(lst))
+}
+
+
+
+#' @title Kappa value for binary classification
+#' @description Returns Kappa value
+#' @param pred vector of predicted labels.
+#' @param obs vector of observed labels.
+#' @param classes vector of length 2 with negative and positive class labels.
+#' @return Kappa value.
+#' @export
+#' @examples
+#' set.seed(42)
+#' obs <- sample(0:1, 10, T)
+#' pred <- sample(0:1, 10, T)
+#' getKappa(pred, obs)
+getKappa <- function (pred, obs, classes = c(0, 1)) {
+  if (length(obs) != length(pred)) {
+    return(NULL)
+  }
+  obs_0 = sum(obs == classes[1])
+  pred_0 = sum(pred == classes[1])
+  obs_1 = sum(obs == classes[2])
+  pred_1 = sum(pred == classes[2])
+  baseline = (obs_0 * pred_0 + obs_1 * pred_1) / (length(obs) ** 2)
+  acc = sum(obs == pred) / length(obs)
+  return((acc - baseline) / (1 - baseline))
 }
 
 
