@@ -31,8 +31,8 @@ getBinaryStat <- function (pred, obs) {
   lst <- list()
   lst$TN <- tbl[1,1]
   lst$TP <- tbl[2,2]
-  lst$FN <- tbl[2,1]
-  lst$FP <- tbl[1,2]
+  lst$FN <- tbl[1,2]
+  lst$FP <- tbl[2,1]
   lst$sensitivity <- lst$TP / (lst$TP + lst$FN)
   lst$specificity <- lst$TN / (lst$TN + lst$FP)
   lst$balanced.acc <- (lst$sensitivity + lst$specificity) / 2
@@ -622,6 +622,39 @@ write.as.binary <- function(df, file.name, sep = "\t", row.names = TRUE, col.nam
   }
   output <- c(output, tmp)
   writeLines(output, file.name, useBytes = TRUE)
+}
+
+
+
+#' Read sirms descriptor saved in svm format.
+#'
+#' @param file_name path to filename to load/
+#' @return data.frame.
+#' @details there should be files with colnames and rownames in the same dir 
+#' along with target file_name. They have to have the same name and extensions 
+#' .colnames and .rownames.
+#' @export
+sirms.read.svm <- function(file_name) {
+  # read main file
+  x <- readLines(file_name)
+  x <- strsplit(x, " |:")
+  x <- sapply(seq_along(x), function(i) {
+    tmp <- cbind(i, matrix(x[[i]], ncol = 2, byrow = TRUE))
+    class(tmp) <- "numeric"
+    tmp[, 2] <- tmp[, 2] + 1
+    tmp
+  })
+  x <- do.call(rbind, x)
+  # read colnames and rownames
+  row_names <- as.character(read.table(paste0(tools::file_path_sans_ext(file_name), ".rownames"))[, 1])
+  col_names <- as.character(read.table(paste0(tools::file_path_sans_ext(file_name), ".colnames"))[, 1])
+  # create output data.frame
+  df <- matrix(0, nrow = length(row_names), ncol = length(col_names))
+  df[x[,c(1,2)]] <- x[, 3]
+  df <- as.data.frame(df)
+  colnames(df) <- col_names
+  rownames(df) <- row_names
+  return(df)
 }
 
 
