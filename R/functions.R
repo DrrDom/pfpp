@@ -343,7 +343,7 @@ create_folds_mc <- function(v, nfolds = "auto", max_iter = 1000, start_opt_param
                             error_limit = NA, seed = 0) {
   
   opt_func <- function(tmp, opt) {
-    return(var(aggregate(tmp, list(opt), sum)[,2]))
+    return(var(aggregate(as.vector(tmp), list(opt), sum)[,2]))
   }
   
   replace_value <- function(input_vector, value, pos) {
