@@ -498,7 +498,7 @@ create_caret_folds <- function(folds_list) {
 #' pred <- runif(100)
 #' rmse(obs, pred)
 rmse <- function(obs, pred) {
-  sqrt(sum((obs - pred) ^ 2) / (length(obs) - 1))
+  sqrt(sum((obs - pred) ^ 2) / (length(obs)))
 }
 
 
