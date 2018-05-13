@@ -1,6 +1,6 @@
 Package: pfpp
 Type: Package
-Title: Different convenience functions (file loading, caret model procesing, etc).
+Title: Different convenience functions (file loading, caret model processing, etc).
 Version: 1.0
 Date: 2014-07-25
 Author: Pavel Polishchuk
@@ -9,3 +9,4 @@ Description: Frequently used functions which can make it easier to load files of
 License: BSD
 Imports:
     reshape2
+RoxygenNote: 6.0.1

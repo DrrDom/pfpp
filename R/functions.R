@@ -840,3 +840,53 @@ spci.melt_data <- function(df) {
   mdf[, "Property"] <- contrib_names[mdf[, "Property"]]
   return(mdf)
 }
+
+
+
+#' Calculate boxplot statistics for ggplot
+#'
+#' @param df input data.frame.
+#' @param group_by column names or indices used for grouping data
+#' @param value.col column name of index of a value used to calculate boxplot statistics
+#' @return list of two data.frames, the first one with boxplot statistics and the second one with outliers
+#' @details uses boxplot.stats as backend. All columns not in group_by will be dropped in output 
+#' data.frame with outliers
+#' @export
+#' @examples
+#' d <- data.frame(a = sample(LETTERS[1:3], 100, replace = T), 
+#'                 b = sample(LETTERS[1:3], 100, replace = T), 
+#'                 c = sample(c(1:3, 10), 100, replace = T),
+#'                 d = sample(c(1:3, 10), 100, replace = T))
+#'                 
+#' ggplot.boxplot.stats(d, c("a", "b"), 3L)
+#' ggplot.boxplot.stats(d, c("a", "b"), "c")                 
+ggplot.boxplot.stats <- function(df, group_by, value.col) {
+
+  ff <- function(df, value.col) {
+    s <- grDevices::boxplot.stats(df[, value.col], do.conf = FALSE)
+    a <- data.frame(matrix(s$stats, nrow = 1))
+    colnames(a) <- c("min", "1q", "median", "3q", "max")
+    if (is.integer(value.col)) {
+      a <- cbind(df[1, -value.col, drop = FALSE], a)
+    } else {
+      if (is.character(value.col)) {
+        a <- cbind(df[1, -which(value.col %in% colnames(df)), drop = FALSE], a)
+      }
+    }
+    b <- df[df[, value.col] %in% s$out, ]
+    list(a, b)
+  }
+
+  r <- lapply(split(cbind(df[, group_by, drop = FALSE], df[, value.col, drop = FALSE]), 
+                    as.list(df[, group_by, drop = FALSE])), ff, value.col = value.col)
+
+  r <- list(boxplot.stat = do.call(rbind, lapply(r, "[[", 1)), 
+            outliers = do.call(rbind, lapply(r, "[[", 2)))
+  
+  rownames(r$boxplot.stat) <- NULL
+  rownames(r$outliers) <- NULL
+  
+  r
+  
+}
+
