@@ -714,7 +714,7 @@ ggplot.boxplot.stats <- function(df, group_by, value.col) {
       a <- cbind(df[1, -value.col, drop = FALSE], a)
     } else {
       if (is.character(value.col)) {
-        a <- cbind(df[1, -which(value.col %in% colnames(df)), drop = FALSE], a)
+        a <- cbind(df[1, -which(colnames(df) == value.col), drop = FALSE], a)
       }
     }
     b <- df[df[, value.col] %in% s$out, ]
