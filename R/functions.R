@@ -692,6 +692,7 @@ sirms.read.svm <- function(file_name) {
 #' @param df input data.frame.
 #' @param group_by column names or indices used for grouping data
 #' @param value.col column name of index of a value used to calculate boxplot statistics
+#' @param ncpu number of cores to calculate statistics. If more than 1 parallel::mclapply function will be used
 #' @return list of two data.frames, the first one with boxplot statistics and the second one with outliers
 #' @details uses boxplot.stats as backend. All columns not in group_by will be dropped in output 
 #' data.frame with outliers
@@ -704,7 +705,7 @@ sirms.read.svm <- function(file_name) {
 #'                 
 #' ggplot.boxplot.stats(d, c("a", "b"), 3L)
 #' ggplot.boxplot.stats(d, c("a", "b"), "c")                 
-ggplot.boxplot.stats <- function(df, group_by, value.col) {
+ggplot.boxplot.stats <- function(df, group_by, value.col, ncpu = 1) {
 
   ff <- function(df, value.col) {
     s <- grDevices::boxplot.stats(df[, value.col], do.conf = FALSE)
@@ -721,8 +722,14 @@ ggplot.boxplot.stats <- function(df, group_by, value.col) {
     list(a, b)
   }
 
-  r <- lapply(split(cbind(df[, group_by, drop = FALSE], df[, value.col, drop = FALSE]), 
-                    as.list(df[, group_by, drop = FALSE])), ff, value.col = value.col)
+  if (ncpu == 1){
+    r <- lapply(split(cbind(df[, group_by, drop = FALSE], df[, value.col, drop = FALSE]), 
+                      as.list(df[, group_by, drop = FALSE])), ff, value.col = value.col)
+  } else {
+    r <- parallel::mclapply(split(cbind(df[, group_by, drop = FALSE], df[, value.col, drop = FALSE]), 
+                            as.list(df[, group_by, drop = FALSE])), ff, value.col = value.col, 
+                            mc.cores = ncpu)
+  }
 
   r <- list(boxplot.stat = do.call(rbind, lapply(r, "[[", 1)), 
             outliers = do.call(rbind, lapply(r, "[[", 2)))

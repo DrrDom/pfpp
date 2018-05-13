@@ -4,7 +4,7 @@
 \alias{ggplot.boxplot.stats}
 \title{Calculate boxplot statistics for ggplot}
 \usage{
-ggplot.boxplot.stats(df, group_by, value.col)
+ggplot.boxplot.stats(df, group_by, value.col, ncpu = 1)
 }
 \arguments{
 \item{df}{input data.frame.}
@@ -12,6 +12,8 @@ ggplot.boxplot.stats(df, group_by, value.col)
 \item{group_by}{column names or indices used for grouping data}
 
 \item{value.col}{column name of index of a value used to calculate boxplot statistics}
+
+\item{ncpu}{number of cores to calculate statistics. If more than 1 parallel::mclapply function will be used}
 }
 \value{
 list of two data.frames, the first one with boxplot statistics and the second one with outliers
