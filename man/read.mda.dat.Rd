@@ -16,5 +16,5 @@ data.frame of descriptors of set of chemical compounds.
 Read dat-file contained descriptors of set of chemical compounds.
 }
 \examples{
-df <- read.mda.dat("all_simplexes.dat")
+\dontrun{df <- read.mda.dat("all_simplexes.dat")}
 }

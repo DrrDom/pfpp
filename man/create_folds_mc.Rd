@@ -4,8 +4,14 @@
 \alias{create_folds_mc}
 \title{Creation of folds for group-out cross-validation based on Monte Carlo method.}
 \usage{
-create_folds_mc(v, nfolds = "auto", max_iter = 1000,
-  start_opt_param = 100, error_limit = NA, seed = 0)
+create_folds_mc(
+  v,
+  nfolds = "auto",
+  max_iter = 1000,
+  start_opt_param = 100,
+  error_limit = NA,
+  seed = 0
+)
 }
 \arguments{
 \item{v}{input vector of group variables.}
@@ -31,6 +37,6 @@ input objects. It creates folds with approaximately equal number of objects in e
 All object of the same group put in the single fold.
 }
 \examples{
-df <- data.frame(A=runif(100), B=runif(100), C=sample(LETTERS[1:10], 100, T))
+df <- data.frame(A=runif(100), B=runif(100), C=sample(LETTERS[1:10], 100, TRUE))
 res <- create_folds_mc(df$C, 5)
 }

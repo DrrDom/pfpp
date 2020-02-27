@@ -16,5 +16,5 @@ vector of predicted values of all folds during cross-validation.
 Returns result of cross-validation step for the optimal model obtained by caret.
 }
 \examples{
-cv.pred <- getCV(pls.model)
+\dontrun{cv.pred <- getCV(pls.model)}
 }

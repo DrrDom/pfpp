@@ -18,7 +18,7 @@ cross-validation considering objects grouping in each folds
 }
 \examples{
 set.seed(42)
-g1 <- sample(1:5, 100, T)
-g2 <- sample(1:5, 100, T)
+g1 <- sample(1:5, 100, TRUE)
+g2 <- sample(1:5, 100, TRUE)
 groupwise_tanimoto(g1, g2)
 }

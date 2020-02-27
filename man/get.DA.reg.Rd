@@ -25,5 +25,5 @@ then the corresponding case is outside applicability domain and is removed
 while computing model statistics
 }
 \examples{
-reg <- get.DA.reg(model)
+\dontrun{reg <- get.DA.reg(model)}
 }

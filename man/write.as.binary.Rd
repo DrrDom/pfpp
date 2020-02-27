@@ -4,8 +4,7 @@
 \alias{write.as.binary}
 \title{Save text data as binary to save used encoding.}
 \usage{
-write.as.binary(df, file.name, sep = "\\t", row.names = TRUE,
-  col.names = TRUE)
+write.as.binary(df, file.name, sep = "\\t", row.names = TRUE, col.names = TRUE)
 }
 \arguments{
 \item{df}{is `data.frame` or `matrix` to save.}

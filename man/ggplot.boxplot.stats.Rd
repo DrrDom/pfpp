@@ -26,10 +26,10 @@ uses boxplot.stats as backend. All columns not in group_by will be dropped in ou
 data.frame with outliers
 }
 \examples{
-d <- data.frame(a = sample(LETTERS[1:3], 100, replace = T), 
-                b = sample(LETTERS[1:3], 100, replace = T), 
-                c = sample(c(1:3, 10), 100, replace = T),
-                d = sample(c(1:3, 10), 100, replace = T))
+d <- data.frame(a = sample(LETTERS[1:3], 100, replace = TRUE), 
+                b = sample(LETTERS[1:3], 100, replace = TRUE), 
+                c = sample(c(1:3, 10), 100, replace = TRUE),
+                d = sample(c(1:3, 10), 100, replace = TRUE))
                 
 ggplot.boxplot.stats(d, c("a", "b"), 3L)
 ggplot.boxplot.stats(d, c("a", "b"), "c")                 

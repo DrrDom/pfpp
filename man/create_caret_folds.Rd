@@ -16,6 +16,6 @@ list of training set object for each fold in format which suit the requirements 
 Transform list of sets of folds to list which may be passed to caret train function.
 }
 \examples{
-folds_list <- lapply(1:10, function(i) sample.int(5, 100, T))
+folds_list <- lapply(1:10, function(i) sample.int(5, 100, TRUE))
 caret_folds_list <- create_caret_folds(folds_list)
 }

@@ -25,7 +25,7 @@ column names in copied object will be shifted one column left.
 \examples{
 a <- 1:10
 names(a) <- LETTERS[1:10]
-write.excel(a)
+\dontrun{write.excel(a)}
 b <- data.frame(V1 = 1:10, V2 = rnorm(10), row.names = LETTERS[1:10])
-write.excel(b)
+\dontrun{write.excel(b)}
 }

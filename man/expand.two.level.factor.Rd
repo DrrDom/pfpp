@@ -4,8 +4,13 @@
 \alias{expand.two.level.factor}
 \title{Expand two-level factor}
 \usage{
-expand.two.level.factor(vec, split = "", var.name = "var", comb.sep = ":",
-  fill = NA)
+expand.two.level.factor(
+  vec,
+  split = "",
+  var.name = "var",
+  comb.sep = ":",
+  fill = NA
+)
 }
 \arguments{
 \item{vec}{vector of two-level factor or character variable. Each element is represented as at least two-letter string.}

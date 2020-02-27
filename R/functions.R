@@ -20,27 +20,29 @@ local.load <- function(file.name) local(get(load(file.name)))
 #' @export
 #' @examples
 #' set.seed(42)
-#' obs <- sample(0:1, 10, T)
-#' pred <- sample(0:1, 10, T)
+#' obs <- sample(0:1, 10, TRUE)
+#' pred <- sample(0:1, 10, TRUE)
 #' getBinaryStat(pred, obs)
-getBinaryStat <- function (pred, obs) {
+getBinaryStat <-  function (pred, obs)
+{
   if (length(obs) != length(pred)) {
     return(NULL)
   }
-  tbl <- table(obs, pred)
+  
   lst <- list()
-  lst$TN <- tbl[1,1]
-  lst$TP <- tbl[2,2]
-  lst$FN <- tbl[1,2]
-  lst$FP <- tbl[2,1]
-  lst$sensitivity <- lst$TP / (lst$TP + lst$FN)
-  lst$specificity <- lst$TN / (lst$TN + lst$FP)
+  
+  lst$TN <- sum((obs == 0) & (pred == 0))
+  lst$TP <- sum((obs == 1) & (pred == 1))
+  lst$FN <- sum((obs == 1) & (pred == 0))
+  lst$FP <- sum((obs == 0) & (pred == 1))
+  
+  lst$sensitivity <- ifelse((lst$TP + lst$FP) != 0, lst$TP / (lst$TP + lst$FN), 0)
+  lst$specificity <- ifelse((lst$TN + lst$FN) != 0, lst$TN / (lst$TN + lst$FP), 0)
   lst$balanced.acc <- (lst$sensitivity + lst$specificity) / 2
   lst$acc <- mean(obs == pred)
   lst$kappa <- pfpp::getKappa(pred, obs)
   return(unlist(lst))
 }
-
 
 
 #' @title Kappa value for binary classification
@@ -52,8 +54,8 @@ getBinaryStat <- function (pred, obs) {
 #' @export
 #' @examples
 #' set.seed(42)
-#' obs <- sample(0:1, 10, T)
-#' pred <- sample(0:1, 10, T)
+#' obs <- sample(0:1, 10, TRUE)
+#' pred <- sample(0:1, 10, TRUE)
 #' getKappa(pred, obs)
 getKappa <- function (pred, obs, classes = c(0, 1)) {
   if (length(obs) != length(pred)) {
@@ -131,7 +133,7 @@ com.cor <- function(x.cor, nx, y.cor, ny){
 #' @return data.frame of descriptors of set of chemical compounds.
 #' @export
 #' @examples
-#' df <- read.mda.dat("all_simplexes.dat")
+#' \dontrun{df <- read.mda.dat("all_simplexes.dat")}
 read.mda.dat <- function(fname.dat) {
   # read cds file
   fname.cds <- sub(".dat$", ".cds", fname.dat)
@@ -156,7 +158,7 @@ read.mda.dat <- function(fname.dat) {
 #' @return vector of predicted values of all folds during cross-validation.
 #' @export
 #' @examples
-#' cv.pred <- getCV(pls.model)
+#' \dontrun{cv.pred <- getCV(pls.model)}
 getCV <- function(caret.model) {
   
   df <- caret.model$pred
@@ -337,7 +339,7 @@ remove.const.vars <- function(df) {
 #' @return vector of folds numbers for each input object.
 #' @export
 #' @examples
-#' df <- data.frame(A=runif(100), B=runif(100), C=sample(LETTERS[1:10], 100, T))
+#' df <- data.frame(A=runif(100), B=runif(100), C=sample(LETTERS[1:10], 100, TRUE))
 #' res <- create_folds_mc(df$C, 5)
 create_folds_mc <- function(v, nfolds = "auto", max_iter = 1000, start_opt_param = 100, 
                             error_limit = NA, seed = 0) {
@@ -407,8 +409,8 @@ create_folds_mc <- function(v, nfolds = "auto", max_iter = 1000, start_opt_param
 #' @export
 #' @examples
 #' set.seed(42)
-#' g1 <- sample(1:5, 100, T)
-#' g2 <- sample(1:5, 100, T)
+#' g1 <- sample(1:5, 100, TRUE)
+#' g2 <- sample(1:5, 100, TRUE)
 #' groupwise_tanimoto(g1, g2)
 groupwise_tanimoto <- function(g1, g2) {
   
@@ -436,7 +438,7 @@ groupwise_tanimoto <- function(g1, g2) {
 #' @return list of sets of folds which are dissimilar to each other
 #' @export
 #' @examples
-#' folds_list <- lapply(1:10, function(i) sample.int(5, 100, T))
+#' folds_list <- lapply(1:10, function(i) sample.int(5, 100, TRUE))
 #' selected_folds <- select_folds(folds_list, 5, 0.7)
 select_folds <- function(folds_list, max_sets = 10, max_sim = 0.8, print_sim_matrix = FALSE) {
   
@@ -468,7 +470,7 @@ select_folds <- function(folds_list, max_sets = 10, max_sim = 0.8, print_sim_mat
 #' @return list of training set object for each fold in format which suit the requirements of caret train function.
 #' @export
 #' @examples
-#' folds_list <- lapply(1:10, function(i) sample.int(5, 100, T))
+#' folds_list <- lapply(1:10, function(i) sample.int(5, 100, TRUE))
 #' caret_folds_list <- create_caret_folds(folds_list)
 create_caret_folds <- function(folds_list) {
   caret_folds <- lapply(folds_list, function(f) {
@@ -535,9 +537,9 @@ combine.datasets <- function(df1, df2, value = 0) {
 #' @examples
 #' a <- 1:10
 #' names(a) <- LETTERS[1:10]
-#' write.excel(a)
+#' \dontrun{write.excel(a)}
 #' b <- data.frame(V1 = 1:10, V2 = rnorm(10), row.names = LETTERS[1:10])
-#' write.excel(b)
+#' \dontrun{write.excel(b)}
 write.excel <- function(x, row.names = TRUE, col.names = TRUE, ...) {
   write.table(x, "clipboard", sep = "\t", row.names = row.names, 
               col.names = col.names, quote = FALSE, ...)
@@ -557,7 +559,7 @@ write.excel <- function(x, row.names = TRUE, col.names = TRUE, ...) {
 #' while computing model statistics
 #' @export
 #' @examples
-#' reg <- get.DA.reg(model)
+#' \dontrun{reg <- get.DA.reg(model)}
 get.DA.reg <- function(model) {
   
   frag_control <- function(train_df, test_df) {
@@ -698,10 +700,10 @@ sirms.read.svm <- function(file_name) {
 #' data.frame with outliers
 #' @export
 #' @examples
-#' d <- data.frame(a = sample(LETTERS[1:3], 100, replace = T), 
-#'                 b = sample(LETTERS[1:3], 100, replace = T), 
-#'                 c = sample(c(1:3, 10), 100, replace = T),
-#'                 d = sample(c(1:3, 10), 100, replace = T))
+#' d <- data.frame(a = sample(LETTERS[1:3], 100, replace = TRUE), 
+#'                 b = sample(LETTERS[1:3], 100, replace = TRUE), 
+#'                 c = sample(c(1:3, 10), 100, replace = TRUE),
+#'                 d = sample(c(1:3, 10), 100, replace = TRUE))
 #'                 
 #' ggplot.boxplot.stats(d, c("a", "b"), 3L)
 #' ggplot.boxplot.stats(d, c("a", "b"), "c")                 

@@ -21,7 +21,7 @@ Returns Kappa value
 }
 \examples{
 set.seed(42)
-obs <- sample(0:1, 10, T)
-pred <- sample(0:1, 10, T)
+obs <- sample(0:1, 10, TRUE)
+pred <- sample(0:1, 10, TRUE)
 getKappa(pred, obs)
 }

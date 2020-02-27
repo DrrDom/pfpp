@@ -9,4 +9,4 @@ Description: Frequently used functions which can make it easier to load files of
 License: BSD
 Imports:
     reshape2
-RoxygenNote: 6.0.1
+RoxygenNote: 7.0.2

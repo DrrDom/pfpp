@@ -4,8 +4,12 @@
 \alias{select_folds}
 \title{Select dissimilar sets of folds.}
 \usage{
-select_folds(folds_list, max_sets = 10, max_sim = 0.8,
-  print_sim_matrix = FALSE)
+select_folds(
+  folds_list,
+  max_sets = 10,
+  max_sim = 0.8,
+  print_sim_matrix = FALSE
+)
 }
 \arguments{
 \item{folds_list}{list of sets of folds, each element is a vector of folds numbers.}
@@ -21,6 +25,6 @@ list of sets of folds which are dissimilar to each other
 Select most dissimilar folds sets from the input list based on groupwise Tanimoto measure.
 }
 \examples{
-folds_list <- lapply(1:10, function(i) sample.int(5, 100, T))
+folds_list <- lapply(1:10, function(i) sample.int(5, 100, TRUE))
 selected_folds <- select_folds(folds_list, 5, 0.7)
 }

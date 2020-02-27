@@ -19,7 +19,7 @@ Returns TP, TN, FP, FN, sensitivity, specificity, balanced accuracy and accuracy
 }
 \examples{
 set.seed(42)
-obs <- sample(0:1, 10, T)
-pred <- sample(0:1, 10, T)
+obs <- sample(0:1, 10, TRUE)
+pred <- sample(0:1, 10, TRUE)
 getBinaryStat(pred, obs)
 }
