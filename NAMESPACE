@@ -2,6 +2,7 @@
 
 export("%nin%")
 export(R2test)
+export(add_list_names_to_col_value)
 export(adjust.dataset)
 export(com.cor)
 export(combine.datasets)

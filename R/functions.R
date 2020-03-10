@@ -743,3 +743,23 @@ ggplot.boxplot.stats <- function(df, group_by, value.col, ncpu = 1) {
   
 }
 
+
+
+#' Isert names of a list of data.frames to data.frames as column value.
+#'
+#' @param lst named list of data.frames.
+#' @param col_name name of a columnof a data.frame to insert the name
+#' @return list of data.frames.
+#' @export
+#' @examples
+#' a <- list(data.frame(A = 1:3, B = 3:5), data.frame(A = 6:9, C = 1:4))
+#' names(a) <- c("first", "second")
+#' add_list_names_to_col_value(a, "D")
+add_list_names_to_col_value <- function(lst, col_name) {
+  q <- lapply(names(lst), function(n) {
+    lst[[n]][, col_name] <- n
+    lst[[n]]
+  })
+  names(q) <- names(lst)
+  q
+}
