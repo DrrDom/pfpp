@@ -763,3 +763,25 @@ add_list_names_to_col_value <- function(lst, col_name) {
   names(q) <- names(lst)
   q
 }
+
+
+
+#' Identify Pareto front for two dimentional problem.
+#'
+#' @param x vector of values
+#' @param y vector of values
+#' @return logical vector where TRUE correspond to point on a Pareto front
+#' @details optimimum value is minimum of x and y by default, 
+#' to change direction of prioritization one should change the sign of that values
+#' @export
+#' @examples
+#' a <- data.frame(x = rnorm(100), y = rnorm(100))
+#' a$front_1 <- pareto_front(a$x, a$y)
+#' # to search for maximum values of x and minimum of y
+#' a$front_1 <- pareto_front(-a$x, a$y)
+pareto_front <- function(x, y) {
+  d <- data.frame(x, y, n = 1:length(x))
+  d <- d[order(d$x, d$y, decreasing=FALSE),]
+  d$front <- !duplicated(cummin(d$y))
+  d[order(d$n), "front"]
+}
