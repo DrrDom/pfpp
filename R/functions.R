@@ -789,3 +789,27 @@ pareto_front <- function(x, y) {
 
 
 cbpallete <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
+
+
+#' Convert dist object to long data.frame
+#'
+#' @param inDist `dist` object
+#' @return `data.frame` in the long format with all pairwise values
+#' @details implemented from https://stackoverflow.com/a/23476844/895544
+#' @export
+#' @examples
+#' a <- data.frame(x = rnorm(100), y = rnorm(100))
+#' d <- dist(a)
+#' df <- dist2longdf(d)
+dist2longdf <- function(inDist) {
+  if (class(inDist) != "dist") stop("wrong input type")
+  A <- attr(inDist, "Size")
+  B <- if (is.null(attr(inDist, "Labels"))) sequence(A) else attr(inDist, "Labels")
+  if (isTRUE(attr(inDist, "Diag"))) attr(inDist, "Diag") <- FALSE
+  if (isTRUE(attr(inDist, "Upper"))) attr(inDist, "Upper") <- FALSE
+  data.frame(
+    row = B[unlist(lapply(sequence(A)[-1], function(x) x:A))],
+    col = rep(B[-length(B)], (length(B)-1):1),
+    value = as.vector(inDist))
+}
