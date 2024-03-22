@@ -7,18 +7,18 @@
 cor_df_long(df, id_cols)
 }
 \arguments{
-\item{df}{`dist` data.frame}
+\item{df}{data.frame}
+
+\item{id_cols}{columns which are not features (descriptors)}
 }
 \value{
-`id_cols` columns which are not features (descriptors)
-
 returns a long data.frame with additional columns: `id1` and `id2` (referencing to the row number of the original data.frame) and `id_cols` with appended `.x` and `.y` suffixes. The column `value` will contain correlation coefficient
 }
 \description{
 Calculate correlation within a data.frame and create a long data.frame as output
 }
 \details{
-all columns which are not inluded in `id_cols` will be used for calculation of correlation.
+all columns which are not included in `id_cols` will be used for calculation of correlation.
 }
 \examples{
 d <- data.frame(name = LETTERS[1:4], x = rnorm(4), y = rnorm(4), z = rnorm(4))

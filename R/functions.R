@@ -818,12 +818,12 @@ dist2longdf <- function(inDist) {
 
 #' Calculate correlation within a data.frame and create a long data.frame as output
 #'
-#' @param df `dist` data.frame
-#' @return `id_cols` columns which are not features (descriptors)
-#' @details all columns which are not inluded in `id_cols` will be used for calculation of correlation.
+#' @param df data.frame
+#' @param id_cols columns which are not features (descriptors)
+#' @details all columns which are not included in `id_cols` will be used for calculation of correlation.
 #' @return returns a long data.frame with additional columns: `id1` and `id2` (referencing to the row number of the original data.frame) and `id_cols` with appended `.x` and `.y` suffixes. The column `value` will contain correlation coefficient
 #' @export
-#' @importFrom dplyr %>% mutate select one_of rename filter ungroup n
+#' @importFrom dplyr %>% mutate select one_of rename filter n
 #' @examples
 #' d <- data.frame(name = LETTERS[1:4], x = rnorm(4), y = rnorm(4), z = rnorm(4))
 #' df <- cor_df_long(d, "name")
@@ -849,6 +849,53 @@ cor_df_long <- function(df, id_cols) {
   
   q <- merge(q, w, by.x = "id1", by.y = "sequential_id")
   q <- merge(q, w, by.x = "id2", by.y = "sequential_id")
+  
+  return(q)
+}
+
+
+
+#' Calculate correlation between two data.frames and create a long data.frame as output
+#'
+#' @param df1 first data.frame
+#' @param df2 second data.frame
+#' @param id_cols1 columns which are not features (descriptors) in the first data.frame
+#' @param id_cols2 columns which are not features (descriptors) in the second data.frame
+#' @details all columns which are not included in `id_cols` will be used for calculation of correlation. The number of feature columns should be identical in both data.frames.
+#' @return returns a long data.frame with additional columns: `id1` and `id2` (referencing to the row number of the original data.frame) and `id_cols` with appended `.x` and `.y` suffixes. The column `value` will contain correlation coefficient
+#' @export
+#' @importFrom dplyr %>% mutate select one_of rename filter n
+#' @examples
+#' d1 <- data.frame(name = LETTERS[1:4], x = rnorm(4), y = rnorm(4), z = rnorm(4))
+#' d2 <- data.frame(name = LETTERS[5:7], x = rnorm(3), y = rnorm(3), z = rnorm(3))
+#' df <- cor_df2_long(d1, d2, "name", "name")
+cor_df2_long <- function(df1, df2, id_cols1, id_cols2) {
+  
+  df1 <- as.data.frame(df1)
+  df2 <- as.data.frame(df2)
+  
+  q <- cor(df1 %>% 
+             select(-any_of(id_cols1)) %>% 
+             t(),
+           df2 %>% 
+             select(-any_of(id_cols2)) %>% 
+             t()) %>% 
+    round(3) %>% 
+    as.data.frame() %>% 
+    mutate(id = paste0("V", 1:nrow(.))) %>% 
+    tidyr::pivot_longer(1:(ncol(.) - 1)) %>% 
+    rename(id1 = id, 
+           id2 = name) %>% 
+    mutate(id1 = as.integer(sub("V", "", id1)),
+           id2 = as.integer(sub("V", "", id2)))
+  
+  w1 <- df1[, id_cols1, drop = FALSE] %>% 
+    mutate(sequential_id = 1:n())
+  w2 <- df2[, id_cols2, drop = FALSE] %>% 
+    mutate(sequential_id = 1:n())
+  
+  q <- merge(q, w1, by.x = "id1", by.y = "sequential_id")
+  q <- merge(q, w2, by.x = "id2", by.y = "sequential_id")
   
   return(q)
 }
