@@ -813,3 +813,42 @@ dist2longdf <- function(inDist) {
     col = rep(B[-length(B)], (length(B)-1):1),
     value = as.vector(inDist))
 }
+
+
+
+#' Calculate correlation within a data.frame and create a long data.frame as output
+#'
+#' @param df `dist` data.frame
+#' @return `id_cols` columns which are not features (descriptors)
+#' @details all columns which are not inluded in `id_cols` will be used for calculation of correlation.
+#' @return returns a long data.frame with additional columns: `id1` and `id2` (referencing to the row number of the original data.frame) and `id_cols` with appended `.x` and `.y` suffixes. The column `value` will contain correlation coefficient
+#' @export
+#' @importFrom dplyr %>% mutate select one_of rename filter ungroup n
+#' @examples
+#' d <- data.frame(name = LETTERS[1:4], x = rnorm(4), y = rnorm(4), z = rnorm(4))
+#' df <- cor_df_long(d, "name")
+cor_df_long <- function(df, id_cols) {
+  
+  df <- as.data.frame(df)
+  
+  q <- cor(df %>% 
+             select(-any_of(id_cols)) %>% 
+             t()) %>% 
+    round(3) %>% 
+    as.data.frame() %>% 
+    mutate(id = paste0("V", 1:nrow(.))) %>% 
+    tidyr::pivot_longer(1:(ncol(.) - 1)) %>% 
+    rename(id1 = id, 
+           id2 = name) %>% 
+    mutate(id1 = as.integer(sub("V", "", id1)),
+           id2 = as.integer(sub("V", "", id2))) %>% 
+    filter(id1 < id2)
+  
+  w <- df[, id_cols, drop = FALSE] %>% 
+    mutate(sequential_id = 1:n())
+  
+  q <- merge(q, w, by.x = "id1", by.y = "sequential_id")
+  q <- merge(q, w, by.x = "id2", by.y = "sequential_id")
+  
+  return(q)
+}
