@@ -899,3 +899,18 @@ cor_df2_long <- function(df1, df2, id_cols1, id_cols2) {
   
   return(q)
 }
+
+
+
+#' Create factors for amino acids in PLIF
+#'
+#' @param plif_name a vector with PLIF names, e.g ala45.ahbdonor, etc
+#' @details 
+#' @return a factor with entries sorted by amino acid number
+#' @export
+#' @examples
+#' x <- paste0(sample(c("ala", "phe", "lys"), size = 6, replace = TRUE), sample.int(500, 6), ".", sample(c("ahbdonor", "ahbacceptor"), size = 6, replace = TRUE))
+#' amino_acid_factors(x)
+amino_acid_factors <- function(plif_names) {
+  return (factor(plif_names, levels = unique(plif_names)[order(as.integer(sub("^[A-Za-z]{3}([0-9]+).*$", "\\1", unique(plif_names))))]))
+}
