@@ -923,7 +923,7 @@ amino_acid_factors <- function(plif_names) {
 #' @details
 #' @return a data.frame containing all columns not included in `feature_cols` if any and two additional columns `x` and `y` with coordinates
 #' @export
-#' @importFrom dplyr %>% mutate select any_of group_by ungroup slice arrange
+#' @importFrom dplyr %>% mutate select any_of group_by ungroup slice arrange row_number cur_group_id
 #' @importFrom Rtsne Rtsne
 #' @example
 #' 
