@@ -112,8 +112,6 @@ com.cor <- function(x.cor, nx, y.cor, ny){
 #' @title Non-matching comparison
 #' @description Returns a logical vector indicating if there is a non-match or match for its left operand. Inverse action relatively to \%in\% function
 #' @usage x \%nin\% y
-#' @param x vector of values to be matched
-#' @param y vector of values to be matched against.
 #' @return logical vector of TRUE (non-match) and FALSE (match).
 #' @seealso \code{\link{\%in\%}}.
 #' @export
@@ -904,7 +902,7 @@ cor_df2_long <- function(df1, df2, id_cols1, id_cols2) {
 
 #' Create factors for amino acids in PLIF
 #'
-#' @param plif_name a vector with PLIF names, e.g ala45.ahbdonor, etc
+#' @param plif_names a vector with PLIF names, e.g ala45.ahbdonor, etc
 #' @details 
 #' @return a factor with entries sorted by amino acid number
 #' @export
@@ -913,4 +911,62 @@ cor_df2_long <- function(df1, df2, id_cols1, id_cols2) {
 #' amino_acid_factors(x)
 amino_acid_factors <- function(plif_names) {
   return (factor(plif_names, levels = unique(plif_names)[order(as.integer(sub("^[A-Za-z]{3}([0-9]+).*$", "\\1", unique(plif_names))))]))
+}
+
+
+
+#' Calculate t-SME coordinates for a data.frame containing duplicated rows
+#'
+#' @param df an input data.frame
+#' @param feature_cols columns with features to be used for creation of a map, if `NULL` - all columns will be used
+#' @param ... parameters passed to Rtsne function
+#' @details
+#' @return a data.frame containing all columns not included in `feature_cols` if any and two additional columns `x` and `y` with coordinates
+#' @export
+#' @importFrom dplyr %>% mutate select any_of group_by ungroup slice arrange
+#' @importFrom Rtsne Rtsne
+#' @example
+#' 
+tsne_for_dupl <- function(df, feature_cols = NULL, ...) {
+  
+  if (".group_id" %in% colnames(df) | ".row_id" %in% colnames(df)) {
+    stop("Columns named .group_id or .row_id are available in the input data.frame. These names are reserved for internal needs")
+  }
+  
+  if (!is.null(feature_cols)) {
+    metadata <- df %>% select(-any_of(feature_cols))
+    df <- df[, feature_cols]
+  }
+  
+  dd <- df %>% 
+    mutate(.row_id = row_number()) %>% 
+    group_by(across(-.row_id)) %>% 
+    mutate(.group_id = cur_group_id()) %>% 
+    ungroup()
+  
+  if (is.null(feature_cols)) {
+    metadata <- dd %>% 
+      select(.row_id, .group_id)
+  } else {
+    metadata <- cbind(metadata, 
+                      dd %>% 
+                        select(.row_id, .group_id))
+  }
+  
+  dd <- dd %>% 
+    select(-.row_id) %>% 
+    group_by(.group_id) %>% 
+    slice(1) %>% 
+    ungroup()
+  
+  p <- Rtsne(dd %>% select(-.group_id), ...)
+  
+  p <- cbind(dd %>% select(.group_id), p$Y)
+  colnames(p)[(ncol(p) - 1):ncol(p)] <- c("x", "y")
+  
+  p <- merge(metadata, p) %>% 
+    arrange(.row_id) %>% 
+    select(-.row_id, -.group_id)
+  
+  return(p)
 }

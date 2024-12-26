@@ -6,11 +6,6 @@
 \usage{
 x \%nin\% y
 }
-\arguments{
-\item{x}{vector of values to be matched}
-
-\item{y}{vector of values to be matched against.}
-}
 \value{
 logical vector of TRUE (non-match) and FALSE (match).
 }

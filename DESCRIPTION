@@ -8,5 +8,5 @@ Maintainer: Pavel Polishchuk <pavel_polishchuk@ukr.net>
 Description: Frequently used functions which can make it easier to load files of specific format, calculate different statistical characteristics, etc.
 License: BSD-3
 Imports:
-    reshape2, dplyr, tidyr
-RoxygenNote: 7.0.2
+    reshape2, dplyr, tidyr, Rtsne
+RoxygenNote: 7.3.1

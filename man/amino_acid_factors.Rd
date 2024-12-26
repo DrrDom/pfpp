@@ -7,7 +7,7 @@
 amino_acid_factors(plif_names)
 }
 \arguments{
-\item{plif_name}{a vector with PLIF names, e.g ala45.ahbdonor, etc}
+\item{plif_names}{a vector with PLIF names, e.g ala45.ahbdonor, etc}
 }
 \value{
 a factor with entries sorted by amino acid number
